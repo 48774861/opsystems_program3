@@ -1,33 +1,38 @@
-#include<unistd.h>
-#include<sys/types.h>
-#include<stdio.h>
-#include<sys/wait.h>
-int main()
-{
-	pid_t p1,p2;
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+
+typedef struct {
+    int m;
+    int n;
+} ThreadParams;
+
+void *thread_function(void *arg);
+
+int main() {
+	pthread_t a_thread; //thread declaration
+	ThreadParams params;
+	params.m = 5;
+	params.n = 7;
 	
-	// Parent P creates one child P1
-	p1=fork();
+	void *result;
+	pthread_create(&a_thread, NULL, thread_function, &params);
+	//thread is created
+	pthread_join(a_thread, &result); //process waits for thread to finish .
+	//Comment this line to see the difference
+	printf("%d",params.m);
+	printf(" + ");
+	printf("%d",params.n);
+	printf(" = ");
+	printf("%d",(int)result);
+}
+void *thread_function(void *arg) {
+	// the work to be done by the thread is defined in this function
+	printf("Inside Thread\n");
+	ThreadParams* params = (ThreadParams*)arg;
+	int m = params->m;
+	int n = params->n;
 	
-	if(p1==0) // Child P1 runs
-	{
-	        p2=fork(); // Child P1 creates one child P2 of its own.
-		if(p2==0) // Child P2 runs
-		{
-			printf("I am child P2 having id %d\n",getpid());
-			printf("My parent P1's id is %d\n",getppid());
-		}
-		else // Child P1 continue to run here.
-		{
-			waitpid(p2,NULL,0); // P1 waits for its child P2 to finish.
-			printf("I am child P1 having id %d\n",getpid());
-		        printf("My parent P's id is %d\n",getppid());
-		}
-	}
-	else // Parent P runs here
-	{
-		waitpid(p1,NULL,0); // Parent P waits to child P1 to finish.
-		printf("I am parent P having id %d\n",getpid());
-                printf("My child P1's id is %d\n",p1);
-	}
+	pthread_exit(m+n);
 }
