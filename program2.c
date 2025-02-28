@@ -28,7 +28,7 @@ int main() {
 
 void *thread1_function(void *arg) {
   // Opens "test.txt" and allow write-only and create access
-  int fd = open("test.txt",O_WRONLY|O_CREAT,0642);
+  int fd = open("Thread.txt",O_WRONLY|O_CREAT,0642);
   
   // Casts the file descriptor as void* so file will accept it.
   pthread_exit((void*)(intptr_t)fd);
